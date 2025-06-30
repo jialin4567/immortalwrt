@@ -1,14 +1,21 @@
-# immortalwrt official feeds
+# immortalwrt official feeds (基础系统，必须保留)
 src-git-full immortalwrt https://github.com/immortalwrt/immortalwrt.git;main
 src-git-full packages https://github.com/immortalwrt/packages.git;master
 src-git-full luci https://github.com/immortalwrt/luci.git;master
 src-git-full routing https://github.com/immortalwrt/routing.git;master
 src-git-full telephony https://github.com/immortalwrt/telephony.git;master
 
-# Lean's (coolsnowwolf) source - The Great Treasure Trove
-src-git lean_packages https://github.com/coolsnowwolf/packages.git;master
-src-git lean_luci https://github.com/coolsnowwolf/luci.git;master
+# --- 第三方插件源 (经过优化的组合) ---
 
-# Other popular packages
+# Lean's packages source (包含大量应用的核心依赖)
+# 注意：我们只用他的 packages, 不用他的 luci, 以免与官方 luci 冲突
+src-git lean https://github.com/coolsnowwolf/packages.git;master
+
+# Lienol's packages (包含 Passwall 等)
 src-git-full lienol https://github.com/Lienol/openwrt-package.git;main
-src-git-full small8 https://github.com/kenzok8/small-package.git
+
+# Kenzok8's small-package (包含 OpenClash 等)
+src-git kenzok8 https://github.com/kenzok8/small-package.git;main
+
+# Kiddin9's packages (作为补充，包含 Passwall2, Bypass 等，非常稳定)
+src-git kiddin9 https://github.com/kiddin9/openwrt-packages.git;master
