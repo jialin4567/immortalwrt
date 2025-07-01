@@ -1,6 +1,6 @@
 #
-# 这是一份最终修正版的 ImmortalWrt GitHub Actions 工作流文件
-# 它修正了 ImmortalWrt 的主分支名称 (master)
+# 这是“黄金最终版”的 ImmortalWrt GitHub Actions 工作流文件
+# 它包含了所有已知的修复和最佳实践
 #
 
 name: Build ImmortalWrt
@@ -8,20 +8,14 @@ name: Build ImmortalWrt
 on:
   push:
     branches:
-      - main # 这里指的是你自己的仓库分支，保持不变
+      - main
   workflow_dispatch:
 
 env:
-  # 源码信息
   REPO_URL: https://github.com/immortalwrt/immortalwrt.git
-  # 核心修正：ImmortalWrt 的主开发分支是 master，不是 main
   REPO_BRANCH: master
-
-  # 配置文件名
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: immortal.config
-
-  # 其他设置
   SSH_ACTION: false
   TZ: Asia/Shanghai
 
@@ -43,14 +37,12 @@ jobs:
 
     - name: Clone ImmortalWrt source code
       run: |
-        # 现在会使用正确的 master 分支来克隆
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
         cd openwrt
-        # 核心修正：确保添加到 feeds.conf.default 的也是 master 分支
-        echo "src-git-full-url immortalwrt https://github.com/immortalwrt/immortalwrt.git;master" >> $FEEDS_CONF
 
     - name: Load custom configuration
       run: |
+        # 将仓库中的 feeds 和 .config 文件复制到 openwrt 目录下
         [ -e $FEEDS_CONF ] && cp $FEEDS_CONF openwrt/feeds.conf.default
         [ -e $CONFIG_FILE ] && cp $CONFIG_FILE openwrt/.config
         cd openwrt
@@ -59,25 +51,26 @@ jobs:
       working-directory: ./openwrt
       run: |
         echo "================================================="
-        echo " Updating feeds..."
+        echo "Updating feeds using feeds.conf.default..."
         echo "================================================="
         ./scripts/feeds update -a
         
         echo "================================================="
-        echo " Removing conflict packages..."
+        echo "CRITICAL STEP: Removing conflict packages..."
         echo "================================================="
+        # 这是解决冲突的核心脚本，它会删除官方源中与 Kenzok8 冲突的包
         rm -rf feeds/luci/applications/luci-app-mosdns
         rm -rf feeds/packages/net/{alist,adguardhome,mosdns,xray*,v2ray*,sing-box,smartdns}
         rm -rf feeds/packages/utils/v2dat
         
         echo "================================================="
-        echo " Cloning specific golang version for compiling"
+        echo "Cloning specific golang version for compiling..."
         echo "================================================="
         rm -rf feeds/packages/lang/golang
         git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
 
         echo "================================================="
-        echo " Installing all packages..."
+        echo "Installing all packages from all feeds..."
         echo "================================================="
         ./scripts/feeds install -a
 
@@ -109,5 +102,5 @@ jobs:
     - name: Upload firmware to artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: ImmortalWrt_Firmware
+        name: ImmortalWrt_Firmware_${{ env.DEVICE_NAME }}
         path: ${{ env.FIRMWARE_PATH }}
