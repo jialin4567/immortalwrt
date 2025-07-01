@@ -16,6 +16,10 @@ src-git-full lienol https://github.com/Lienol/openwrt-package.git;main
 
 # Kenzok8's small-package (包含 OpenClash 等)
 src-git kenzok8 https://github.com/kenzok8/small-package.git;main
+src-git kenzo https://github.com/kenzok8/openwrt-packages
+src-git small https://github.com/kenzok8/small
 
-# Kiddin9's packages (作为补充，包含 Passwall2, Bypass 等，非常稳定)
-src-git kiddin9 https://github.com/kiddin9/openwrt-packages.git;master
+# fw876/helloworld (包含 shadowsocks-rust 和 ssr-plus，轻量级科学上网插件)
+src-git helloworld https://github.com/fw876/helloworld
+
+
