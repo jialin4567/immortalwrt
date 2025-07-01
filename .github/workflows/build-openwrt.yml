@@ -1,6 +1,6 @@
 #
-# 这是一份经过优化的 ImmortalWrt GitHub Actions 工作流文件
-# 它包含了自动解决软件包冲突的关键步骤
+# 这是一份最终修正版的 ImmortalWrt GitHub Actions 工作流文件
+# 它解决了 feeds 冲突并使用了当前有效的编译依赖
 #
 
 name: Build ImmortalWrt
@@ -36,7 +36,8 @@ jobs:
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install ack antlr3 aria2 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib git gperf haveged help2man intltool jikespg-dev libelf-dev libfuse-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev libreadline-dev libssl-dev libtool lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pip qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
+        # 核心修正：已从下面的列表中移除了 jikespg-dev
+        sudo -E apt-get -qq install ack antlr3 aria2 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib git gperf haveged help2man intltool libelf-dev libfuse-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev libreadline-dev libssl-dev libtool lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pip qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
 
@@ -48,7 +49,6 @@ jobs:
 
     - name: Load custom configuration
       run: |
-        # 将仓库中的 feeds.conf.default 和 .config 文件复制到 openwrt 目录下
         [ -e $FEEDS_CONF ] && cp $FEEDS_CONF openwrt/feeds.conf.default
         [ -e $CONFIG_FILE ] && cp $CONFIG_FILE openwrt/.config
         cd openwrt
@@ -64,7 +64,6 @@ jobs:
         echo "================================================="
         echo " Removing conflict packages..."
         echo "================================================="
-        # 核心冲突解决步骤：在安装前，删除官方源中的同名软件包
         rm -rf feeds/luci/applications/luci-app-mosdns
         rm -rf feeds/packages/net/{alist,adguardhome,mosdns,xray*,v2ray*,sing-box,smartdns}
         rm -rf feeds/packages/utils/v2dat
@@ -72,7 +71,6 @@ jobs:
         echo "================================================="
         echo " Cloning specific golang version for compiling"
         echo "================================================="
-        # 使用 kenzok8 提供的、经过测试的 Go 编译器版本
         rm -rf feeds/packages/lang/golang
         git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
 
@@ -111,3 +109,4 @@ jobs:
       with:
         name: ImmortalWrt_Firmware
         path: ${{ env.FIRMWARE_PATH }}
+
