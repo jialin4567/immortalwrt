@@ -20,6 +20,6 @@ src-git kenzo https://github.com/kenzok8/openwrt-packages
 src-git small https://github.com/kenzok8/small
 
 # fw876/helloworld (包含 shadowsocks-rust 和 ssr-plus，轻量级科学上网插件)
-src-git helloworld https://github.com/fw876/helloworld
+# src-git helloworld https://github.com/fw876/helloworld
 
 
