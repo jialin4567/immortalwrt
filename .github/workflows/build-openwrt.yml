@@ -1,6 +1,6 @@
 #
 # 这是一份最终修正版的 ImmortalWrt GitHub Actions 工作流文件
-# 它解决了 feeds 冲突并使用了当前有效的编译依赖
+# 它修正了 ImmortalWrt 的主分支名称 (master)
 #
 
 name: Build ImmortalWrt
@@ -8,21 +8,22 @@ name: Build ImmortalWrt
 on:
   push:
     branches:
-      - main  # 当 main 分支有更新时触发
-  workflow_dispatch: # 允许你手动点击 "Run workflow" 按钮来运行
+      - main # 这里指的是你自己的仓库分支，保持不变
+  workflow_dispatch:
 
 env:
   # 源码信息
   REPO_URL: https://github.com/immortalwrt/immortalwrt.git
-  REPO_BRANCH: main
+  # 核心修正：ImmortalWrt 的主开发分支是 master，不是 main
+  REPO_BRANCH: master
 
   # 配置文件名
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: immortal.config # 请确保你的配置文件叫这个名字
+  CONFIG_FILE: immortal.config
 
   # 其他设置
-  SSH_ACTION: false # 设置为 true 可以用 SSH 连接到 Actions 虚拟机进行调试
-  TZ: Asia/Shanghai # 设置时区
+  SSH_ACTION: false
+  TZ: Asia/Shanghai
 
 jobs:
   build:
@@ -36,16 +37,17 @@ jobs:
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        # 核心修正：已从下面的列表中移除了 jikespg-dev
         sudo -E apt-get -qq install ack antlr3 aria2 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib git gperf haveged help2man intltool libelf-dev libfuse-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev libreadline-dev libssl-dev libtool lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pip qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
 
     - name: Clone ImmortalWrt source code
       run: |
+        # 现在会使用正确的 master 分支来克隆
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
         cd openwrt
-        echo "src-git-full-url immortalwrt https://github.com/immortalwrt/immortalwrt.git;main" >> $FEEDS_CONF
+        # 核心修正：确保添加到 feeds.conf.default 的也是 master 分支
+        echo "src-git-full-url immortalwrt https://github.com/immortalwrt/immortalwrt.git;master" >> $FEEDS_CONF
 
     - name: Load custom configuration
       run: |
@@ -109,4 +111,3 @@ jobs:
       with:
         name: ImmortalWrt_Firmware
         path: ${{ env.FIRMWARE_PATH }}
-
