@@ -8,10 +8,10 @@ src-git-full telephony https://github.com/immortalwrt/telephony.git;master
 # --- 第三方插件源 (经过优化的组合) ---
 
 # Lean's packages source (包含大量应用的核心依赖)
-src-git lean https://github.com/coolsnowwolf/packages.git;master
+# src-git lean https://github.com/coolsnowwolf/packages.git;master
 
 # Lienol's packages (包含 Passwall 等)
-src-git-full lienol https://github.com/Lienol/openwrt-package.git;main
+# src-git-full lienol https://github.com/Lienol/openwrt-package.git;main
 
 # Kenzok8's packages (包含 OpenClash 等，已精简避免冲突)
 src-git kenzo https://github.com/kenzok8/openwrt-packages
